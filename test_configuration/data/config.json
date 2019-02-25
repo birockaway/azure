@@ -1,0 +1,24 @@
+{
+    "storage": {
+       "input": {
+            "tables": [{
+                    "source": "in.c-test.data",
+                    "destination": "test.csv",
+                    "limit": 50,
+                    "columns": [],
+                    "where_values": [],
+                    "where_operator": "eq"
+                }],
+            "files": []
+        },
+        "output": {
+            "tables": [],
+            "files": []
+        }
+    },
+    "parameters":{                    
+  "#azureConnectionString": "",
+  "destinationFolder": "test"
+},
+    "image_parameters": []
+}

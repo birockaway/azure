@@ -1,0 +1,27 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Azure writer config",
+	"type": "object",
+	"properties": {
+		"account": {
+			"title": "Azure account",
+			"type": "string",
+			"description": "account name"
+		},
+		"#storageAccountKey": {
+			"title": "Storage key",
+			"type": "string",
+			"description": "Storage key"
+		},
+		"container": {
+			"title": "Destination container name",
+			"type": "string",
+			"description": "Name of existing container"
+		}
+	},
+	"required": [
+		"account",
+		"#storageAccountKey",
+                "container"
+	]
+}
