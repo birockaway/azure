@@ -19,7 +19,7 @@
     "parameters":{                    
   "account_key": "",
   "account_name": "mallkbcin",
-  "destination_container": "test_py"
+  "destination_container": "test"
 },
     "image_parameters": []
 }
