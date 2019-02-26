@@ -17,7 +17,7 @@
         }
     },
     "parameters":{                    
-  "account_key": "3VzTp6dJqA6KguRqgQetgJ+7m11hsGu9LNjfznKHFP0k7cmfSpi4lOan1b7nYhGFxxosiSg3/XcLxGtRV0i/PQ==",
+  "account_key": "",
   "account_name": "mallkbcin",
   "destination_container": "test_py"
 },
