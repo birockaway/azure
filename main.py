@@ -25,7 +25,7 @@ print(f'Uploading tables {in_tables_list} to BlockBlobService...')
 def write_table(block_blob_service, destination_container, table_name):
 	block_blob_service.create_blob_from_path(
 	    destination_container,
-	    'test.csv',
+	    table_name,
 	    '/data/in/tables/'+table_name,
 	    content_settings=ContentSettings(content_type='application/CSV')
 		)
