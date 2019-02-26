@@ -1,9 +1,7 @@
-FROM maven:3-jdk-8
-MAINTAINER David Esner <esnerda@gmail.com>
+FROM quay.io/keboola/docker-custom-python:latest
+MAINTAINER Viktor Sohajek <sohajek.viktor@gmail.com>
 
-ENV APP_VERSION 1.1.0
- WORKDIR /home
-RUN git clone https://github.com/viktorsohajek/azure_kbc_writer.git ./  #v1.0
-RUN mvn compile
-
-ENTRYPOINT mvn -q exec:java -Dexec.args=/data  
+CMD ['pip', 'install', 'azure-storage-blob']
+COPY . /code/
+WORKDIR /data/
+CMD ["python", "-u", "/code/main.py"]
