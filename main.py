@@ -21,10 +21,20 @@ print(f'Cointainer connected to {account_name} account of BlockBlobService...')
 in_tables_list = [i for i in os.listdir(in_tables_dir) if i.endswith('.csv')]
 print(f'Uploading tables {in_tables_list} to BlockBlobService...')
 #Upload the CSV file to Azure cloud
-block_blob_service.create_blob_from_path(
-    destination_container,
-    'test.csv',
-    'data/in/tables/test.csv',
-    content_settings=ContentSettings(content_type='application/CSV')
-	)
-print(f'Tables {in_tables_list} sucessfuly uploaded to BlockBlobService...')
+
+def write_table(block_blob_service, destination_container, table_name):
+	block_blob_service.create_blob_from_path(
+	    destination_container,
+	    'test.csv',
+	    'data/in/tables/'+table_name,
+	    content_settings=ContentSettings(content_type='application/CSV')
+		)
+
+for table_name in in_tables_list:
+	try:
+		write_table(block_blob_service, destination_container, table_name)
+		print(f'Table {table_name} sucessfuly uploaded to BlockBlobService...')
+	except:
+		print(f'Something went wrong during {table_name} table upload...')
+
+print('Job finished.')
