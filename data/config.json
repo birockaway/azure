@@ -1,0 +1,25 @@
+{
+    "storage": {
+       "input": {
+            "tables": [{
+                    "source": "in.c-test.data",
+                    "destination": "test.csv",
+                    "limit": 50,
+                    "columns": [],
+                    "where_values": [],
+                    "where_operator": "eq"
+                }],
+            "files": []
+        },
+        "output": {
+            "tables": [],
+            "files": []
+        }
+    },
+    "parameters":{                    
+  "account_key": "3VzTp6dJqA6KguRqgQetgJ+7m11hsGu9LNjfznKHFP0k7cmfSpi4lOan1b7nYhGFxxosiSg3/XcLxGtRV0i/PQ==",
+  "account_name": "mallkbcin",
+  "destination_container": "test_py"
+},
+    "image_parameters": []
+}
