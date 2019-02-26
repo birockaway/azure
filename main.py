@@ -4,13 +4,13 @@ from keboola import docker # pro komunikaci s parametrama a input/output mapping
 import os
 
 # initialize KBC configuration 
-cfg = docker.Config('./data/')
+cfg = docker.Config('/data/')
 # loads application parameters - user defined
 parameters = cfg.get_parameters()
 account_key = parameters.get('account_key')
 account_name = parameters.get('account_name')
 destination_container = parameters.get('destination_container')
-in_tables_dir = 'data/in/tables/'
+in_tables_dir = '/data/in/tables/'
 
 
 block_blob_service = BlockBlobService(account_name=account_name, account_key=account_key)
@@ -26,7 +26,7 @@ def write_table(block_blob_service, destination_container, table_name):
 	block_blob_service.create_blob_from_path(
 	    destination_container,
 	    'test.csv',
-	    'data/in/tables/'+table_name,
+	    '/data/in/tables/'+table_name,
 	    content_settings=ContentSettings(content_type='application/CSV')
 		)
 
