@@ -19,7 +19,9 @@
     "parameters":{                    
   "account_key": "",
   "account_name": "mallkbcin",
-  "destination_container": "test"
+  "destination_container": "test",
+  "table_name_suffix_type": "snapshot",
+  "date_col": "DATE"
 },
     "image_parameters": []
 }
