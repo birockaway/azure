@@ -5,8 +5,8 @@ import os
 from datetime import datetime
 import pandas as pd
 
-in_tables_dir = 'data/in/tables/'
-in_config_dir = 'data/'
+in_tables_dir = '/data/in/tables/'
+in_config_dir = '/data/'
 date_col_default = 'date'
 
 # get KBC parameters
