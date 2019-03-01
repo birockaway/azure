@@ -39,10 +39,10 @@ def get_suffix(table_name, table_name_suffix_type):
 			table_name_suffix = ''
 			print(f"Column '{date_col}' was not found in {table_name} table.")
 	else:
-		table_name_suffix = ''		
+		table_name_suffix = ''
 	print(f"The {table_name} table's suffix was set as '{table_name_suffix}'")
 
-	return table_name_suffix
+	return table_name_suffix.replace('-','')
 
 block_blob_service = BlockBlobService(account_name=account_name, account_key=account_key)
 print(f'Docker cointainer will try to connect to {account_name} account of BlockBlobService...')
