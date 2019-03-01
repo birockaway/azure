@@ -8,6 +8,7 @@ import pandas as pd
 in_tables_dir = '/data/in/tables/'
 in_config_dir = '/data/'
 date_col_default = 'date'
+suffix_delimiter = '-'
 
 # get KBC parameters
 cfg = docker.Config(in_config_dir)
@@ -27,11 +28,11 @@ def get_suffix(table_name, table_name_suffix_type):
 	Get suffix for the destination table name.
 	"""
 	if table_name_suffix_type == 'snapshot':		
-		table_name_suffix = datetime.now().strftime("%Y%m%d%H%M%S")
+		table_name_suffix = suffix_delimiter + datetime.now().strftime("%Y%m%d%H%M%S")
 	elif table_name_suffix_type == 'max_date':
 		try:
 			table_dates_df = pd.read_csv(in_tables_dir+table_name, usecols=[date_col])
-			table_name_suffix = '_'+str(table_dates_df[date_col].max())
+			table_name_suffix = suffix_delimiter + str(table_dates_df[date_col].max())
 			print(f"Suffix based on maximum of '{date_col}' column in {table_name} table.")
 		except:
 			table_name_suffix = ''
@@ -49,7 +50,8 @@ print(f'Docker cointainer will try to connect to {account_name} account of Block
 # Create the container if it does not exist.
 #block_blob_service.create_container(destination_container)
 
-in_tables_list = [i for i in os.listdir(in_tables_dir) if i.endswith('.csv')]
+in_tables_list = [os.path.splitext(i)[0] for i in os.listdir(in_tables_dir) if i.endswith('.csv')]
+print(f"Tables to be uploaded: {in_tables_list}")
 print(f'Uploading tables {in_tables_list} to {destination_container} storage container of BlockBlobService...')
 
 #Upload the CSV file to Azure cloud
@@ -59,8 +61,8 @@ def write_table(block_blob_service, destination_container, table_name, table_nam
 	"""	
 	block_blob_service.create_blob_from_path(
 	    destination_container,
-	    table_name,
-	    in_tables_dir+table_name+table_name_suffix,
+	    table_name + table_name_suffix + '.csv',
+	    in_tables_dir + table_name + '.csv',
 	    content_settings=ContentSettings(content_type='application/CSV')
 		)
 
@@ -68,7 +70,8 @@ for table_name in in_tables_list:
 	try:
 		write_table(block_blob_service, destination_container, table_name, get_suffix(table_name, table_name_suffix_type))
 		print(f'Table {table_name} sucessfuly uploaded to {destination_container} storage container of BlockBlobService...')
-	except:
+	except Exception as e:
 		print(f'Something went wrong during {table_name} table upload...')
+		print(f"Exception: {str(e)}")
 
 print('Job finished.')
