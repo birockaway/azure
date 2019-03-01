@@ -9,6 +9,7 @@ in_tables_dir = '/data/in/tables/'
 in_config_dir = '/data/'
 date_col_default = 'date'
 suffix_delimiter = '-'
+csv_suffix = '.csv'
 
 # get KBC parameters
 cfg = docker.Config(in_config_dir)
@@ -31,7 +32,7 @@ def get_suffix(table_name, table_name_suffix_type):
 		table_name_suffix = suffix_delimiter + datetime.now().strftime("%Y%m%d%H%M%S")
 	elif table_name_suffix_type == 'max_date':
 		try:
-			table_dates_df = pd.read_csv(in_tables_dir+table_name, usecols=[date_col])
+			table_dates_df = pd.read_csv(in_tables_dir + table_name + csv_suffix, usecols=[date_col])
 			table_name_suffix = suffix_delimiter + str(table_dates_df[date_col].max())
 			print(f"Suffix based on maximum of '{date_col}' column in {table_name} table.")
 		except:
@@ -50,7 +51,7 @@ print(f'Docker cointainer will try to connect to {account_name} account of Block
 # Create the container if it does not exist.
 #block_blob_service.create_container(destination_container)
 
-in_tables_list = [os.path.splitext(i)[0] for i in os.listdir(in_tables_dir) if i.endswith('.csv')]
+in_tables_list = [os.path.splitext(i)[0] for i in os.listdir(in_tables_dir) if i.endswith(csv_suffix)]
 print(f"Tables to be uploaded: {in_tables_list}")
 print(f'Uploading tables {in_tables_list} to {destination_container} storage container of BlockBlobService...')
 
@@ -61,8 +62,8 @@ def write_table(block_blob_service, destination_container, table_name, table_nam
 	"""	
 	block_blob_service.create_blob_from_path(
 	    destination_container,
-	    table_name + table_name_suffix + '.csv',
-	    in_tables_dir + table_name + '.csv',
+	    table_name + table_name_suffix + csv_suffix,
+	    in_tables_dir + table_name + csv_suffix,
 	    content_settings=ContentSettings(content_type='application/CSV')
 		)
 
