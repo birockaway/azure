@@ -33,7 +33,7 @@ def get_suffix(table_name, table_name_suffix_type):
 	elif table_name_suffix_type == 'max_date':
 		try:
 			table_dates_df = pd.read_csv(in_tables_dir + table_name + csv_suffix, usecols=[date_col])
-			table_name_suffix = suffix_delimiter + str(table_dates_df[date_col].max())
+			table_name_suffix = suffix_delimiter + str(table_dates_df[date_col].max()).replace('-','')
 			print(f"Suffix based on maximum of '{date_col}' column in {table_name} table.")
 		except:
 			table_name_suffix = ''
@@ -42,7 +42,7 @@ def get_suffix(table_name, table_name_suffix_type):
 		table_name_suffix = ''
 	print(f"The {table_name} table's suffix was set as '{table_name_suffix}'")
 
-	return table_name_suffix.replace('-','')
+	return table_name_suffix
 
 block_blob_service = BlockBlobService(account_name=account_name, account_key=account_key)
 print(f'Docker cointainer will try to connect to {account_name} account of BlockBlobService...')
