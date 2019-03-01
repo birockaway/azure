@@ -4,4 +4,4 @@ MAINTAINER Viktor Sohajek <sohajek.viktor@gmail.com>
 RUN ["pip", "install", "azure-storage-blob"]
 RUN git clone https://github.com/birockaway/azure.git ./ #v1.1.8
 WORKDIR /data/
-CMD ["python","/home/main.py"8
+CMD ["python","/home/main.py"]
