@@ -19,8 +19,8 @@
     "parameters":{                    
   "account_key": "",
   "account_name": "mallbiddingindev",
-  "destination_container": "kbc/unit_economics",
-  "table_name_suffix_type": "snapshot"
+  "data_container": "kbc/data",
+  "config_container": "kbc/config"
 },
     "image_parameters": []
 }
