@@ -30,7 +30,6 @@ date_col = parameters.get('date_col')
 if not date_col:
 	date_col = date_col_default
 
-
 block_blob_service = BlockBlobService(account_name=account_name, account_key=account_key)
 base_blob_service = BaseBlobService(account_name=account_name, account_key=account_key)
 print(f'Docker cointainer will try to connect to {account_name} account of BlockBlobService...')
@@ -103,6 +102,15 @@ def update_config_file(file_path, new_last_date):
 	with open(file_path, 'w') as outfile:  
 		json.dump(config, outfile)
 
+def write_table_list_to_azure(block_blob_service, data_container, tables_folder, table_name_list):
+	for table_name in table_name_list:
+		try:
+			write_table(block_blob_service, data_container, tables_folder)
+			print(f'Table {table_name} sucessfuly uploaded to {data_container} storage container of BlockBlobService...')		
+		except Exception as e:
+				print(f'Something went wrong during {table_name} table upload...')
+				print(f"Exception: {str(e)}")
+
 # TODO:
 # Create the container if it does not exist.
 #block_blob_service.create_container(data_container)
@@ -111,41 +119,38 @@ in_tables_list = [os.path.splitext(i)[0] for i in os.listdir(in_tables_dir) if i
 print(f"Tables to be uploaded: {in_tables_list}")
 print(f'Uploading tables {in_tables_list} to {data_container} storage container of BlockBlobService...')
 
-# Expand in tables & update config
-for table_name in in_tables_list:
-	try:
-		config_file_path = out_data_dir + table_name + config_suffix
-		download_config(base_blob_service, config_container, table_name)
-		latest_date = get_latest_date_from_config_file(config_file_path)
-		expand_table(table_name, latest_date)
-		new_last_date = get_new_last_date(table_name)
-		update_config_file(config_file_path, new_last_date)
-		write_new_config(block_blob_service, config_container, out_data_dir, table_name)
-		print(f'Config for {table_name} sucessfuly uploaded to {config_container} storage container of BlockBlobService...')
-	except Exception as e:
-		print(f'Something went wrong during {table_name} table upload...')
-		print(f"Exception: {str(e)}")
-
-# Get out tables list
-out_tables_list = [os.path.splitext(i)[0] for i in os.listdir(out_tables_dir) if i.endswith(csv_suffix)]
-
-# Write expanded out tables to Azure
-for table_name in out_tables_list:
-	try:
-		write_table(block_blob_service, data_container, out_tables_dir, table_name)
-		print(f'Table {table_name} sucessfuly uploaded to {data_container} storage container of BlockBlobService...')		
-	except Exception as e:
+if not config_container:
+	write_table_list_to_azure(block_blob_service, data_container, in_tables_list, in_tables_list)
+else:	
+	# Expand in tables & update config
+	for table_name in in_tables_list:
+		try:
+			config_file_path = out_data_dir + table_name + config_suffix
+			download_config(base_blob_service, config_container, table_name)
+			latest_date = get_latest_date_from_config_file(config_file_path)
+			expand_table(table_name, latest_date)
+			new_last_date = get_new_last_date(table_name)
+			update_config_file(config_file_path, new_last_date)
+			write_new_config(block_blob_service, config_container, out_data_dir, table_name)
+			print(f'Config for {table_name} sucessfuly uploaded to {config_container} storage container of BlockBlobService...')
+		except Exception as e:
 			print(f'Something went wrong during {table_name} table upload...')
 			print(f"Exception: {str(e)}")
 
-# Remove files from out folder
-folder = out_tables_dir
-for the_file in os.listdir(folder):
-    file_path = os.path.join(folder, the_file)
-    try:
-        if os.path.isfile(file_path):
-            os.unlink(file_path)
-    except Exception as e:
-        print(e)			
+	# Get out tables list
+	out_tables_list = [os.path.splitext(i)[0] for i in os.listdir(out_tables_dir) if i.endswith(csv_suffix)]
+
+	# Write expanded out tables to Azure
+	write_table_list_to_azure(block_blob_service, data_container, out_tables_dir, out_tables_list)
+
+	# Remove files from out folder
+	folder = out_tables_dir
+	for the_file in os.listdir(folder):
+	    file_path = os.path.join(folder, the_file)
+	    try:
+	        if os.path.isfile(file_path):
+	            os.unlink(file_path)
+	    except Exception as e:
+	        print(e)			
 
 print('Job finished.')
