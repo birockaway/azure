@@ -18,9 +18,8 @@
     },
     "parameters":{                    
   "account_key": "",
-  "account_name": "mallbiddingindev",
-  "data_container": "kbc/data",
-  "config_container": "kbc/config"
+  "account_name": "mallbiddingstagedev",
+  "data_container": "mapping"
 },
     "image_parameters": []
 }

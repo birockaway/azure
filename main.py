@@ -8,10 +8,10 @@ import pandas as pd
 import json
 import os, shutil
 
-in_tables_dir = '/data/in/tables/'
-out_tables_dir = '/data/out/tables/'
-out_data_dir = '/data/out/'
-in_config_dir = '/data/'
+in_tables_dir = 'data/in/tables/'
+out_tables_dir = 'data/out/tables/'
+out_data_dir = 'data/out/'
+in_config_dir = 'data/'
 date_col_default = 'date'
 suffix_delimiter = '-'
 csv_suffix = '.csv'
@@ -120,7 +120,7 @@ print(f"Tables to be uploaded: {in_tables_list}")
 print(f'Uploading tables {in_tables_list} to {data_container} storage container of BlockBlobService...')
 
 if not config_container:
-	write_table_list_to_azure(block_blob_service, data_container, in_tables_list, in_tables_list)
+	write_table_list_to_azure(block_blob_service, data_container, in_tables_dir, in_tables_list)
 else:	
 	# Expand in tables & update config
 	for table_name in in_tables_list:
