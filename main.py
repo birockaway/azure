@@ -105,7 +105,7 @@ def update_config_file(file_path, new_last_date):
 def write_table_list_to_azure(block_blob_service, data_container, tables_folder, table_name_list):
 	for table_name in table_name_list:
 		try:
-			write_table(block_blob_service, data_container, tables_folder)
+			write_table(block_blob_service, data_container, tables_folder, table_name)
 			print(f'Table {table_name} sucessfuly uploaded to {data_container} storage container of BlockBlobService...')		
 		except Exception as e:
 				print(f'Something went wrong during {table_name} table upload...')
