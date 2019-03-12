@@ -8,10 +8,10 @@ import pandas as pd
 import json
 import os, shutil
 
-in_tables_dir = 'data/in/tables/'
-out_tables_dir = 'data/out/tables/'
-out_data_dir = 'data/out/'
-in_config_dir = 'data/'
+in_tables_dir = '/data/in/tables/'
+out_tables_dir = '/data/out/tables/'
+out_data_dir = '/data/out/'
+in_config_dir = '/data/'
 date_col_default = 'date'
 suffix_delimiter = '-'
 csv_suffix = '.csv'
