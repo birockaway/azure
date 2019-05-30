@@ -8,10 +8,10 @@ import pandas as pd
 import json
 import os, shutil
 
-in_tables_dir = '/data/in/tables/'
-out_tables_dir = '/data/out/tables/'
-out_data_dir = '/data/out/'
-in_config_dir = '/data/'
+in_tables_dir = './data/in/tables/'
+out_tables_dir = './data/out/tables/'
+out_data_dir = './data/out/'
+in_config_dir = './data/'
 date_col_default = 'date'
 suffix_delimiter = '-'
 csv_suffix = '.csv'
@@ -73,7 +73,6 @@ def expand_table(table_name, latest_date):
 	data_df[date_col] = data_df[date_col].dt.strftime("%Y%m%d")
 	dates = list(pd.unique(data_df[date_col]))
 	new_dates = [date for date in dates if date > latest_date]
-	
 	for new_date in new_dates:
 		new_data_df = data_df[data_df[date_col] == new_date]
 		table_name_suffix = suffix_delimiter + str(new_data_df[date_col].max()).replace('-','')
