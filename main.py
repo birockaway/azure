@@ -111,7 +111,7 @@ def concat_chunks(out_tables_dir):
 		        print(e)
 
 def get_new_last_date(table_name, tables_dir=out_tables_dir):
-	date_suffixes = [os.path.splitext(i)[0][-10:] for i in os.listdir(out_tables_dir) if i.endswith(csv_suffix) and i.startswith(table_name)]
+	date_suffixes = [x.split('-')[1].split('_')[0] for x in os.listdir(out_tables_dir) if x.endswith(csv_suffix) and x.startswith(table_name)]	
 	max_date = max([int(s) for s in date_suffixes])
 
 	return str(max_date)
@@ -159,6 +159,7 @@ else:
 			latest_date = get_latest_date_from_config_file(config_file_path)
 			expand_table(table_name, latest_date)
 			new_last_date = get_new_last_date(table_name)
+			print(f"New last date is: {new_last_date}")
 			update_config_file(config_file_path, new_last_date)
 			write_new_config(block_blob_service, config_container, out_data_dir, table_name)
 			print(f'Config for {table_name} sucessfuly uploaded to {config_container} storage container of BlockBlobService...')
@@ -171,6 +172,7 @@ else:
 
 	# Get out tables list
 	out_tables_list = [os.path.splitext(i)[0] for i in os.listdir(out_tables_dir) if i.endswith(csv_suffix)]
+	print(f"Tables to be write: {out_tables_list}")
 
 	# Write expanded out tables to Azure
 	write_table_list_to_azure(block_blob_service, data_container, out_tables_dir, out_tables_list)
