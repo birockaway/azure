@@ -8,10 +8,10 @@ import pandas as pd
 import json
 import os, shutil
 
-in_tables_dir = './data/in/tables/'
-out_tables_dir = './data/out/tables/'
-out_data_dir = './data/out/'
-in_config_dir = './data/'
+in_tables_dir = '/data/in/tables/'
+out_tables_dir = '/data/out/tables/'
+out_data_dir = '/data/out/'
+in_config_dir = '/data/'
 date_col_default = 'date'
 suffix_delimiter = '-'
 csv_suffix = '.csv'
@@ -69,19 +69,49 @@ def write_new_config(block_blob_service, data_container, config_folder, table_na
 		)
 
 def expand_table(table_name, latest_date):
-	data_df = pd.read_csv(in_tables_dir + table_name + csv_suffix, parse_dates = [date_col])
-	data_df[date_col] = data_df[date_col].dt.strftime("%Y%m%d")
-	dates = list(pd.unique(data_df[date_col]))
-	new_dates = [date for date in dates if date > latest_date]
-	for new_date in new_dates:
-		new_data_df = data_df[data_df[date_col] == new_date]
-		table_name_suffix = suffix_delimiter + str(new_data_df[date_col].max()).replace('-','')
-		new_data_df.to_csv(out_tables_dir + table_name + table_name_suffix + csv_suffix)
+	chunk_no = 0
+	for data_df in pd.read_csv(in_tables_dir + table_name + csv_suffix, chunksize=5000000, parse_dates=[date_col]):
+		chunk_no += 1
+		print(f"Getting chunk No. {chunk_no}...")		
+		data_df[date_col] = data_df[date_col].dt.strftime("%Y%m%d")
+		dates = list(pd.unique(data_df[date_col]))
+		
+		new_dates = [date for date in dates if date > latest_date]
 
-	
+		for new_date in new_dates:
+			new_data_df = data_df[data_df[date_col] == new_date]
+			date_suffix = suffix_delimiter + str(new_data_df[date_col].max()).replace('-','')
+			table_name_and_date = table_name + date_suffix
+			chunk_suffix = '_' + str(len([x for x in os.listdir(out_tables_dir) if x.startswith(table_name_and_date)]))
+			new_data_df.to_csv(out_tables_dir + table_name_and_date + chunk_suffix + csv_suffix)
+
+def concat_chunks(out_tables_dir):
+	print("Concatting the chunks...")
+	csv_file_list = [os.path.splitext(i)[0] for i in os.listdir(out_tables_dir) if i.endswith(csv_suffix)]
+	date_suffix_set = set([x.split('-')[1].split('_')[0] for x in csv_file_list])
+
+	for date in date_suffix_set:
+		date_table_names = [x for x in csv_file_list if date in x]
+
+		df_list = []
+		for filename in date_table_names:
+		    df = pd.read_csv(out_tables_dir + filename + csv_suffix, index_col=None, header=0)
+		    df_list.append(df)
+		# concat the table
+		concated_df = pd.concat(df_list, axis=0, ignore_index=True)
+		# save concated table
+		concated_df.to_csv(out_tables_dir + date_table_names[0][:-2] + csv_suffix)
+		# remove chunk files from out folder
+		for the_file in date_table_names:
+		    file_path = os.path.join(out_tables_dir, the_file + csv_suffix)
+		    try:
+		        if os.path.isfile(file_path):
+		            os.unlink(file_path)
+		    except Exception as e:
+		        print(e)
 
 def get_new_last_date(table_name, tables_dir=out_tables_dir):
-	date_suffixes = [os.path.splitext(i)[0][-8:] for i in os.listdir(out_tables_dir) if i.endswith(csv_suffix) and i.startswith(table_name)]
+	date_suffixes = [os.path.splitext(i)[0][-10:] for i in os.listdir(out_tables_dir) if i.endswith(csv_suffix) and i.startswith(table_name)]
 	max_date = max([int(s) for s in date_suffixes])
 
 	return str(max_date)
@@ -135,6 +165,9 @@ else:
 		except Exception as e:
 			print(f'Something went wrong during {table_name} table upload...')
 			print(f"Exception: {str(e)}")
+
+	# Concat chunks to single date csv
+	concat_chunks(out_tables_dir)
 
 	# Get out tables list
 	out_tables_list = [os.path.splitext(i)[0] for i in os.listdir(out_tables_dir) if i.endswith(csv_suffix)]
