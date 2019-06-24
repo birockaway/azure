@@ -42,14 +42,14 @@ def download_config(base_blob_service, config_container, table_name):
 	except:
 		brand_new_config = {}
 		brand_new_config['latest'] = '19700101'
-		with open(config_path, 'w') as outfile:  
+		with open(config_path, 'w') as outfile:
 			json.dump(brand_new_config, outfile)
 
 #Upload the CSV file to Azure cloud
 def write_table(block_blob_service, data_container, tables_folder, table_name, table_name_suffix=''):
 	"""
 	write the table to blob storage.
-	"""	
+	"""
 	block_blob_service.create_blob_from_path(
 	    data_container,
 	    table_name + table_name_suffix + csv_suffix,
@@ -60,7 +60,7 @@ def write_table(block_blob_service, data_container, tables_folder, table_name, t
 def write_new_config(block_blob_service, data_container, config_folder, table_name):
 	"""
 	write the config to blob storage.
-	"""	
+	"""
 	block_blob_service.create_blob_from_path(
 	    data_container,
 	    table_name + config_suffix,
@@ -72,10 +72,10 @@ def expand_table(table_name, latest_date):
 	chunk_no = 0
 	for data_df in pd.read_csv(in_tables_dir + table_name + csv_suffix, chunksize=5000000, parse_dates=[date_col]):
 		chunk_no += 1
-		print(f"Getting chunk No. {chunk_no}...")		
+		print(f"Getting chunk No. {chunk_no}...")
 		data_df[date_col] = data_df[date_col].dt.strftime("%Y%m%d")
 		dates = list(pd.unique(data_df[date_col]))
-		
+
 		new_dates = [date for date in dates if date > latest_date]
 
 		for new_date in new_dates:
@@ -88,7 +88,7 @@ def expand_table(table_name, latest_date):
 def concat_chunks(out_tables_dir):
 	print("Concatting the chunks...")
 	csv_file_list = [os.path.splitext(i)[0] for i in os.listdir(out_tables_dir) if i.endswith(csv_suffix)]
-	date_suffix_set = set([x.split('-')[1].split('_')[0] for x in csv_file_list])
+	date_suffix_set = set([x.split('-')[-1].split('_')[0] for x in csv_file_list])
 
 	for date in date_suffix_set:
 		date_table_names = [x for x in csv_file_list if date in x]
@@ -111,7 +111,7 @@ def concat_chunks(out_tables_dir):
 		        print(e)
 
 def get_new_last_date(table_name, tables_dir=out_tables_dir):
-	date_suffixes = [x.split('-')[1].split('_')[0] for x in os.listdir(out_tables_dir) if x.endswith(csv_suffix) and x.startswith(table_name)]	
+	date_suffixes = [x.split('-')[-1].split('_')[0] for x in os.listdir(out_tables_dir) if x.endswith(csv_suffix) and x.startswith(table_name)]
 	max_date = max([int(s) for s in date_suffixes])
 
 	return str(max_date)
@@ -128,14 +128,14 @@ def update_config_file(file_path, new_last_date):
 		config = json.load(f)
 	config['latest'] = new_last_date
 
-	with open(file_path, 'w') as outfile:  
+	with open(file_path, 'w') as outfile:
 		json.dump(config, outfile)
 
 def write_table_list_to_azure(block_blob_service, data_container, tables_folder, table_name_list):
 	for table_name in table_name_list:
 		try:
 			write_table(block_blob_service, data_container, tables_folder, table_name)
-			print(f'Table {table_name} sucessfuly uploaded to {data_container} storage container of BlockBlobService...')		
+			print(f'Table {table_name} sucessfuly uploaded to {data_container} storage container of BlockBlobService...')
 		except Exception as e:
 				print(f'Something went wrong during {table_name} table upload...')
 				print(f"Exception: {str(e)}")
@@ -150,7 +150,7 @@ print(f'Uploading tables {in_tables_list} to {data_container} storage container 
 
 if not config_container:
 	write_table_list_to_azure(block_blob_service, data_container, in_tables_dir, in_tables_list)
-else:	
+else:
 	# Expand in tables & update config
 	for table_name in in_tables_list:
 		try:
@@ -185,6 +185,6 @@ else:
 	        if os.path.isfile(file_path):
 	            os.unlink(file_path)
 	    except Exception as e:
-	        print(e)			
+	        print(e)
 
 print('Job finished.')
