@@ -83,7 +83,7 @@ def expand_table(table_name, latest_date):
 			date_suffix = suffix_delimiter + str(new_data_df[date_col].max()).replace('-','')
 			table_name_and_date = table_name + date_suffix
 			chunk_suffix = '_' + str(len([x for x in os.listdir(out_tables_dir) if x.startswith(table_name_and_date)]))
-			new_data_df.to_csv(out_tables_dir + table_name_and_date + chunk_suffix + csv_suffix)
+			new_data_df.to_csv(out_tables_dir + table_name_and_date + chunk_suffix + csv_suffix, index=False)
 
 def concat_chunks(out_tables_dir):
 	print("Concatting the chunks...")
@@ -100,7 +100,7 @@ def concat_chunks(out_tables_dir):
 		# concat the table
 		concated_df = pd.concat(df_list, axis=0, ignore_index=True)
 		# save concated table
-		concated_df.to_csv(out_tables_dir + date_table_names[0][:-2] + csv_suffix)
+		concated_df.to_csv(out_tables_dir + date_table_names[0][:-2] + csv_suffix, index=False)
 		# remove chunk files from out folder
 		for the_file in date_table_names:
 		    file_path = os.path.join(out_tables_dir, the_file + csv_suffix)
