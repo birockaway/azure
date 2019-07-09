@@ -27,12 +27,8 @@ account_name = parameters.get('account_name')
 data_container = parameters.get('data_container')
 config_container = parameters.get('config_container')
 date_col = parameters.get('date_col')
-rename_cols = parameters.get('rename_cols')
 
-# change rename_cols string to dict
-if rename_cols:
-	rename_cols = json.loads(rename_cols.replace("'", "\""))
-
+# when date_col is not in params, set to default value
 if not date_col:
 	date_col = date_col_default
 
@@ -77,9 +73,6 @@ def write_new_config(block_blob_service, data_container, config_folder, table_na
 def expand_table(table_name, latest_date):
 	chunk_no = 0
 	for data_df in pd.read_csv(in_tables_dir + table_name + csv_suffix, chunksize=5000000, parse_dates=[date_col]):
-		# renames columns if opted in config
-		if rename_cols:
-			data_df.rename(index=str, columns=rename_cols, inplace=True)
 		chunk_no += 1
 		print(f"Getting chunk No. {chunk_no}...")
 		data_df[date_col] = data_df[date_col].dt.strftime("%Y%m%d")
@@ -104,10 +97,7 @@ def concat_chunks(out_tables_dir):
 
 		df_list = []
 		for filename in date_table_names:
-		    df = pd.read_csv(out_tables_dir + filename + csv_suffix, index_col=None, header=0)
-			# renames columns if opted in config
-		    if rename_cols:
-		    	df.rename(index=str, columns=rename_cols, inplace=True)			
+		    df = pd.read_csv(out_tables_dir + filename + csv_suffix, index_col=None, header=0)	
 		    df_list.append(df)
 		# concat the table
 		concated_df = pd.concat(df_list, axis=0, ignore_index=True)
@@ -146,11 +136,6 @@ def update_config_file(file_path, new_last_date):
 def write_table_list_to_azure(block_blob_service, data_container, tables_folder, table_name_list):
 	for table_name in table_name_list:
 		try:
-			# renames columns with pandas if opted in config
-			if rename_cols:
-				df = pd.read_csv(tables_folder + table_name + csv_suffix)
-				df.rename(index=str, columns=rename_cols, inplace=True)
-				df.to_csv(tables_folder + table_name + csv_suffix, index=False)
 			write_table(block_blob_service, data_container, tables_folder, table_name)
 			print(f'Table {table_name} sucessfuly uploaded to {data_container} storage container of BlockBlobService...')
 		except Exception as e:
