@@ -146,6 +146,11 @@ def update_config_file(file_path, new_last_date):
 def write_table_list_to_azure(block_blob_service, data_container, tables_folder, table_name_list):
 	for table_name in table_name_list:
 		try:
+			# renames columns with pandas if opted in config
+			if rename_cols:
+				df = pd.read_csv(tables_folder + table_name + csv_suffix)
+				df.rename(index=str, columns=rename_cols, inplace=True)
+				df.to_csv(tables_folder + table_name + csv_suffix, index=False)
 			write_table(block_blob_service, data_container, tables_folder, table_name)
 			print(f'Table {table_name} sucessfuly uploaded to {data_container} storage container of BlockBlobService...')
 		except Exception as e:
