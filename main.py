@@ -27,10 +27,11 @@ account_name = parameters.get('account_name')
 data_container = parameters.get('data_container')
 config_container = parameters.get('config_container')
 date_col = parameters.get('date_col')
-rename_cols_param = parameters.get('rename_cols')
+rename_cols = parameters.get('rename_cols')
 
-# create rename dictionary
-rename_cols = json.loads(rename_cols_param.replace("'", "\""))
+# change rename_cols string to dict
+if rename_cols:
+	rename_cols = json.loads(rename_cols.replace("'", "\""))
 
 if not date_col:
 	date_col = date_col_default
