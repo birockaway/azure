@@ -27,7 +27,10 @@ account_name = parameters.get('account_name')
 data_container = parameters.get('data_container')
 config_container = parameters.get('config_container')
 date_col = parameters.get('date_col')
-rename_cols = parameters.get('rename_cols')
+rename_cols_param = parameters.get('rename_cols')
+
+# create rename dictionary
+rename_cols = json.loads(rename_cols_param.replace("'", "\""))
 
 if not date_col:
 	date_col = date_col_default
@@ -102,8 +105,8 @@ def concat_chunks(out_tables_dir):
 		for filename in date_table_names:
 		    df = pd.read_csv(out_tables_dir + filename + csv_suffix, index_col=None, header=0)
 			# renames columns if opted in config
-			if rename_cols:
-				df.rename(index=str, columns=rename_cols, inplace=True)
+		    if rename_cols:
+		    	df.rename(index=str, columns=rename_cols, inplace=True)			
 		    df_list.append(df)
 		# concat the table
 		concated_df = pd.concat(df_list, axis=0, ignore_index=True)
